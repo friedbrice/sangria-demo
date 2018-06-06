@@ -1,0 +1,14 @@
+table: shopper
+  id, name
+
+table: merchant
+  id, name, description
+
+table: item
+  id, name, price, description
+
+table: transaction
+  id, timestamp, shopper.id, merchant.id
+
+table: transaction_items
+  id, transaction.id, item.id

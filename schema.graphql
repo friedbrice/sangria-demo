@@ -1,0 +1,54 @@
+query {
+
+  shoppers(ids: [ID!]): [Shopper!]!
+
+  merchants(ids: [ID!]): [Merchant!]!
+
+  items(ids: [ID!]): [Merchant!]!
+
+  transactions(ids: [ID!],
+               sinceDate: String,
+               beforeDate: String,
+               shoppers: [ID!],
+               merchants: [ID!],
+               items: [ID!]): [Transaction!]!  
+}
+
+type Shopper {
+  id: ID!
+  name: String!
+  transactions(sinceDate: String,
+               beforeDate: String,
+               merchants: [ID!],
+               items: [ID!]): [Transaction!]!
+}
+
+type Merchant {
+  id: ID!
+  name: String!
+  description: String
+  transactions(sinceDate: String,
+               beforeDate: String,
+               shoppers: [ID!],
+               items: [ID!]): [Transaction!]!
+}
+
+type Item {
+  id: ID!
+  name: String!
+  price: Int!
+  description: String
+  transactions(sinceDate: String,
+               beforeDate: String,
+               shoppers: [ID!],
+               merchants: [ID!]): [Transaction!]!
+}
+
+type Transaction {
+  id: ID!
+  date: String!
+  shopper: Shopper!
+  merchant: Merchant!
+  items: [Item!]!
+  total: Int!
+}
