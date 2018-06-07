@@ -50,9 +50,6 @@
     <script src="//cdn.jsdelivr.net/graphiql/0.8.0/graphiql.min.js"></script>
 </head>
 <body>
-<form>
-    <input type="text" id="cjdev-key" placeholder="Enter Dev Key" value="">
-</form>
 <div id="graphiql">Loading...</div>
 
 <script>
@@ -118,12 +115,11 @@
       // Defines a GraphQL fetcher using the fetch API.
       function graphQLFetcher(graphQLParams) {
 
-        return fetch(window.location.origin + '/query', {
+        return fetch(window.location.origin + '/', {
           method: 'post',
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + document.getElementById('cjdev-key').value,
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(graphQLParams),
           credentials: 'include',

@@ -6,36 +6,32 @@ import fi.iki.elonen.NanoHTTPD
 
 object Main extends App {
 
-/*
-NanoHTTPD.newFixedLengthResponse(
-  /* status */ ???,
-  /* mimeType */ ???,
-  /* txt */ ???
-)
-*/
-
-  val handleNotFound: NanoHTTPD.Response =
+  def handleError(status: NanoHTTPD.Response.Status): NanoHTTPD.Response =
     NanoHTTPD.newFixedLengthResponse(
-      /* status */ NanoHTTPD.Response.Status.NOT_FOUND,
-      /* mimeType */ ???,
-      /* txt */ ???
-    )
-
-  val handleNotAllowed: NanoHTTPD.Response =
-    NanoHTTPD.newFixedLengthResponse(
-      /* status */ NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED,
-      /* mimeType */ ???,
-      /* txt */ ???
+      status,
+      "application/json",
+      s"""{"data":null,"errors":[{"message":"$status"}]}"""
     )
 
   val handleGet: NanoHTTPD.Response =
     NanoHTTPD.newFixedLengthResponse(
-      /*status = */ NanoHTTPD.Response.Status.OK,
-      /*mimeType = */ NanoHTTPD.MIME_HTML,
-      /*txt = */ scala.io.Source.fromResource("graphiql.html").mkString
+      NanoHTTPD.Response.Status.OK,
+      "text/html",
+      scala.io.Source.fromResource("graphiql.html").mkString
     )
 
-  def handlePost(body: InputStream): NanoHTTPD.Response = ???
+  def handlePost(body: InputStream): NanoHTTPD.Response = {
+
+//    ???
+//
+//    NanoHTTPD.newFixedLengthResponse(
+//      /* status */ ???,
+//      /* mimeType */ ???,
+//      /* txt */ ???
+//    )
+
+    handleError(NanoHTTPD.Response.Status.INTERNAL_ERROR)
+  }
 
   val server: NanoHTTPD = new NanoHTTPD(8080) {
 
@@ -45,10 +41,10 @@ NanoHTTPD.newFixedLengthResponse(
         case "/" => session.getMethod match {
           case NanoHTTPD.Method.GET => handleGet
           case NanoHTTPD.Method.POST => handlePost(session.getInputStream)
-          case _ => handleNotAllowed
+          case _ => handleError(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED)
         }
 
-        case _ => handleNotFound
+        case _ => handleError(NanoHTTPD.Response.Status.NOT_FOUND)
       }
   }
 
