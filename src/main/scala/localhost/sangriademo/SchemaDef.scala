@@ -1,7 +1,8 @@
 package localhost.sangriademo
 
 import sangria.schema.{
-  Argument, Field, fields, IntType, ListInputType, ListType, ObjectType, OptionInputType
+  Argument, Field, fields, IntType, ListInputType,
+  ListType, ObjectType, OptionInputType, Schema
 }
 import sangria.macros.derive
 
@@ -118,4 +119,6 @@ object SchemaDef {
         )
       )
     )
+
+  lazy val schema: Schema[AppContext, Unit] = Schema(query)
 }
