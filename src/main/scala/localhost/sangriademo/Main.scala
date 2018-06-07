@@ -3,7 +3,6 @@ package localhost.sangriademo
 import java.io.InputStream
 
 import fi.iki.elonen.NanoHTTPD
-import sangria.schema.Schema
 
 object Main extends App {
 
