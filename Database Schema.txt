@@ -1,14 +1,11 @@
 table: shopper
-  id, name
-
-table: merchant
-  id, name, description
+  int id, string name
 
 table: item
-  id, name, price, description
+  int id, string name, int price, (string|null) description
 
 table: transaction
-  id, timestamp, shopper.id, merchant.id
+  int id, int date, int shopper.id
 
 table: transaction_items
-  id, transaction.id, item.id
+ int id, int transaction.id, int item.id
