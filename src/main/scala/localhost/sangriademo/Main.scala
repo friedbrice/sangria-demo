@@ -21,9 +21,7 @@ object Main extends App {
       scala.io.Source.fromResource("graphiql.html").mkString
     )
 
-  def handlePost(schema: Schema[AppContext, Unit],
-                 appContext: AppContext,
-                 body: InputStream): NanoHTTPD.Response = {
+  def handlePost(body: InputStream): NanoHTTPD.Response = {
 
 //    ???
 //
@@ -36,25 +34,15 @@ object Main extends App {
     handleError(NanoHTTPD.Response.Status.INTERNAL_ERROR)
   }
 
-  val schema: Schema[AppContext, Unit] = SchemaDef.schema
-
-  val appContext: AppContext = FalsoDB.appContext
-
   val server: NanoHTTPD = new NanoHTTPD(8080) {
 
     override def serve(session: NanoHTTPD.IHTTPSession): NanoHTTPD.Response =
       session.getUri match {
 
         case "/" => session.getMethod match {
-
-          case NanoHTTPD.Method.GET =>
-            handleGet
-
-          case NanoHTTPD.Method.POST =>
-            handlePost(schema, appContext, session.getInputStream)
-
-          case _ =>
-            handleError(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED)
+          case NanoHTTPD.Method.GET => handleGet
+          case NanoHTTPD.Method.POST => handlePost(session.getInputStream)
+          case _ => handleError(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED)
         }
 
         case _ =>
