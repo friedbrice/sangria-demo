@@ -74,6 +74,14 @@ object SchemaDef {
 
   lazy val transaction: ObjectType[AppContext, Transaction] =
     derive.deriveObjectType[AppContext, Transaction](
+      derive.ReplaceField(
+        fieldName = "shopperId",
+        field = Field(
+          name = "shopper",
+          fieldType = shopper,
+          resolve = cc => cc.ctx.transactionShopper(cc.value)
+        )
+      ),
       derive.AddFields(
         Field(
           name = "items",

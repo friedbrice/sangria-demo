@@ -19,6 +19,9 @@ object FalsoDB {
                          shopperIds: Option[Seq[Int]]): Seq[Transaction] =
       queryTransactions(None, sinceDate, beforeDate, None, Some(List(item.id)))
 
+    override def transactionShopper(transaction: Transaction): Shopper =
+      fakeShoppers(transaction.shopperId)
+
     def transactionItems(transaction: Transaction): Seq[Item] =
       fakeTransactionItems.values
         .filter(ti => ti.transactionId == transaction.id)

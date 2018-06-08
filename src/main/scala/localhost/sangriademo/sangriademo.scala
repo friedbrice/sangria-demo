@@ -28,6 +28,8 @@ trait AppContext {
                        beforeDate: Option[Int],
                        shopperIds: Option[Seq[Int]]): Seq[Transaction]
 
+  def transactionShopper(transaction: Transaction): Shopper
+
   def transactionItems(transaction: Transaction): Seq[Item]
 
   def transactionTotal(transaction: Transaction): Int
