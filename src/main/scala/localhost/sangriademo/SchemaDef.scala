@@ -1,15 +1,15 @@
 package localhost.sangriademo
 
 import sangria.schema.{
-  Argument => GqlArgument,
-  OptionInputType => GqlInputOption,
-  ListInputType => GqlInputList,
-  IntType => GqlInt,
-  ObjectType => GqlObject,
-  Field => GqlField,
-  ListType => GqlList,
-  fields => gqlFields,
-  Schema => GqlSchema
+  Argument        => GqlArgument,
+  Field           => GqlField,
+  IntType         => GqlInt,
+  ListInputType   => GqlListInput,
+  ListType        => GqlList,
+  ObjectType      => GqlObject,
+  OptionInputType => GqlOptionInput,
+  Schema          => GqlSchema,
+  fields          => gqlFields
 }
 import sangria.macros.derive
 
@@ -18,31 +18,31 @@ object SchemaDef {
   lazy val itemIds: GqlArgument[Option[Seq[Int]]] =
     GqlArgument(
       name = "itemIds",
-      argumentType = GqlInputOption(GqlInputList(GqlInt))
+      argumentType = GqlOptionInput(GqlListInput(GqlInt))
     )
 
   lazy val shopperIds: GqlArgument[Option[Seq[Int]]] =
     GqlArgument(
       name = "shopperIds",
-      argumentType = GqlInputOption(GqlInputList(GqlInt))
+      argumentType = GqlOptionInput(GqlListInput(GqlInt))
     )
 
   lazy val transactionIds: GqlArgument[Option[Seq[Int]]] =
     GqlArgument(
       name = "transactionIds",
-      argumentType = GqlInputOption(GqlInputList(GqlInt))
+      argumentType = GqlOptionInput(GqlListInput(GqlInt))
     )
 
   lazy val sinceDate: GqlArgument[Option[Int]] =
     GqlArgument(
       name = "sinceDate",
-      argumentType = GqlInputOption(GqlInt)
+      argumentType = GqlOptionInput(GqlInt)
     )
 
   lazy val beforeDate: GqlArgument[Option[Int]] =
     GqlArgument(
       name = "beforeDate",
-      argumentType = GqlInputOption(GqlInt)
+      argumentType = GqlOptionInput(GqlInt)
     )
 
   lazy val shopper: GqlObject[AppContext, Shopper] =
