@@ -9,9 +9,7 @@ import sangria.parser.QueryParser
 
 import scala.io.Source
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
-/** Application Layer */
 object Main extends App {
 
   import localhost.sangriademo.guts.Server._
@@ -57,13 +55,11 @@ object Main extends App {
     val maybeExecutedQuery: Either[Response, Json] =
       maybeParsedQuery.flatMap { parsedQuery =>
 
-        val future: Future[Json] = Executor.execute(
+        Executor.execute(
           schema = SchemaDef.schema,
           queryAst = parsedQuery,
           userContext = FalsoDB.appContext
-        )
-
-        future.ifFailed { err =>
+        ).ifFailed { err =>
           (500, "application/json", format(err.toString))
         }
       }
