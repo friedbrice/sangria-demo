@@ -4,9 +4,9 @@ import argonaut.Json
 import localhost.sangriademo.guts.Eithers._
 import localhost.sangriademo.guts.FalsoDB
 import sangria.ast.Document
-import sangria.execution.{Executor, QueryAnalysisError}
+import sangria.execution.{Executor, ValidationError}
 import sangria.marshalling.argonaut._
-import sangria.parser.QueryParser
+import sangria.parser.{QueryParser, SyntaxError}
 
 import scala.io.Source
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,7 +16,7 @@ object Main extends App {
   import localhost.sangriademo.guts.Server._
 
   def format(msg: String): String =
-    s"""{"data":null,"errors":[{"message":"$msg"}]}"""
+    s"""{"data":null,"errors":[{"message":"${msg.filterNot(_.isControl)}"}]}"""
 
   def handlePost(postBody: String): Response = {
 
@@ -32,8 +32,13 @@ object Main extends App {
     val maybeParsedQuery: Either[Response, Document] =
       maybeQuery.flatMap { query =>
         QueryParser.parse(query)
-          .ifFailed { case err: QueryAnalysisError =>
-            (401, "application/json", err.resolveError.nospaces)
+          .ifFailed {
+
+            case err: SyntaxError =>
+              (401, "application/json", format(err.getMessage))
+
+            case err =>
+              (500, "application/json", format(err.getMessage))
           }
       }
 
@@ -43,8 +48,13 @@ object Main extends App {
           schema = SchemaDef.schema,
           queryAst = parsedQuery,
           userContext = FalsoDB.appContext
-        ).ifFailed { err =>
-          (500, "application/json", format(err.toString))
+        ).ifFailed {
+
+          case err: ValidationError =>
+            (401, "application/json", err.resolveError.nospaces)
+
+          case err =>
+            (500, "application/json", format(err.getMessage))
         }
       }
 
