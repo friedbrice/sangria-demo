@@ -31,7 +31,7 @@ object Main extends App {
 
     val maybeParsedQuery: Either[Response, Document] =
       maybeQuery.flatMap { query =>
-        QueryParser.parse(query)
+        QueryParser.parse(query) // From Sangria. Parses a GraphQL query.
           .ifFailed {
 
             case err: SyntaxError =>
@@ -44,10 +44,10 @@ object Main extends App {
 
     val maybeExecutedQuery: Either[Response, Json] =
       maybeParsedQuery.flatMap { parsedQuery =>
-        Executor.execute(
-          schema = SchemaDef.schema,
-          queryAst = parsedQuery,
-          userContext = FalsoDB.appContext
+        Executor.execute( // From Sangria.
+          queryAst    = parsedQuery,       // Accepts the query.
+          schema      = SchemaDef.schema,  // Validates it against the Schema.
+          userContext = FalsoDB.appContext // Executes it using our AppContext.
         ).ifFailed {
 
           case err: ValidationError =>
@@ -58,14 +58,12 @@ object Main extends App {
         }
       }
 
-    val maybeResponse: Either[Response, Response] =
+    val finalResponse: Either[Response, Response] =
       maybeExecutedQuery.map { json =>
         (200, "application/json", json.nospaces)
       }
 
-    val response: Response = maybeResponse.converge
-
-    response
+    finalResponse.converge
   }
 
   serve(8080) {
