@@ -1,9 +1,6 @@
 package localhost.sangriademo
 
-import sangria.schema.{
-  Argument, Field, fields, IntType, ListInputType,
-  ListType, ObjectType, OptionInputType, Schema
-}
+import sangria.schema._
 import sangria.macros.derive
 
 object SchemaDef {

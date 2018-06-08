@@ -1,7 +1,5 @@
 package localhost.sangriademo
 
-import scala.util.Random
-
 object FalsoDB {
 
   val appContext: AppContext = new AppContext {
@@ -76,8 +74,8 @@ object FalsoDB {
 
   val fakeTransactions: Map[Int, Transaction] = {
     val ids = 0 to 20
-    val dates = ids.map(_ => Random.nextInt).sorted
-    val shoppers = ids.map(_ => Random.shuffle(0 to 5).head)
+    val dates = ids.map(_ => math.abs(scala.util.Random.nextInt)).sorted
+    val shoppers = ids.map(_ => scala.util.Random.shuffle(0 to 5).head)
 
     (ids zip dates zip shoppers).map {
       case ((id, d), s) => (id, Transaction(id, d, s))
@@ -86,8 +84,8 @@ object FalsoDB {
 
   val fakeTransactionItems: Map[Int, TransactionItem] = {
     val ids = 0 to 55
-    val transactions = ids.map(_ => Random.shuffle(0 to 20).head)
-    val items = ids.map(_ => Random.shuffle(0 to 5).head)
+    val transactions = ids.map(_ => scala.util.Random.shuffle(0 to 20).head)
+    val items = ids.map(_ => scala.util.Random.shuffle(0 to 5).head)
 
     (ids zip transactions zip items).map {
       case ((id, t), i) => (id, TransactionItem(id, t, i))
