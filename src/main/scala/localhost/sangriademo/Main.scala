@@ -1,54 +1,77 @@
 package localhost.sangriademo
 
-import java.io.InputStream
-
 import argonaut.Json
-import fi.iki.elonen.NanoHTTPD
-import fi.iki.elonen.NanoHTTPD.{IHTTPSession, Method, Response}
-import fi.iki.elonen.NanoHTTPD.Response.Status
+import localhost.sangriademo.Eithers._
+import sangria.ast.Document
+import sangria.execution.{Executor, QueryAnalysisError}
+import sangria.marshalling.argonaut._
+import sangria.parser.QueryParser
 
 import scala.io.Source
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.Try
 
 object Main extends App {
 
-  def htmlResponse(status: Status, body: String): Response =
-    NanoHTTPD.newFixedLengthResponse(status, "text/html", body)
-
-  def jsonResponse(status: Status, json: Json): Response =
-    NanoHTTPD.newFixedLengthResponse(status, "application/json", json.toString)
-
-  def errorResponse(status: Status, msg: String = null): Response = {
-    def body = Json.obj(
-      "data" -> Json.jNull,
-      "errors" -> Json.array(
-        Json.obj(
-          "message" -> Json.jString(Option(msg).getOrElse(status.toString))
-        )
-      )
-    )
-
-    jsonResponse(status, body)
-  }
+  import Server._
 
   val handleGet: Response =
     htmlResponse(Status.OK, Source.fromResource("graphiql.html").mkString)
 
-  def handlePost(input: InputStream): Response = ???
+  def handlePost(requestBody: String): Response = {
 
-  val server: NanoHTTPD = new NanoHTTPD(8080) {
+    val maybeQuery: Either[Response, String] = {
 
-    override def serve(session: IHTTPSession): Response =
-      session.getUri match {
+      val optionString: Option[String] =
+        argonaut.Parse.parseOption(requestBody)
+          .flatMap(_.field("query"))
+          .flatMap(_.string)
 
-        case "/" => session.getMethod match {
-          case Method.GET => handleGet
-          case Method.POST => handlePost(session.getInputStream)
-          case _ => errorResponse(Status.METHOD_NOT_ALLOWED)
-        }
-
-        case _ => errorResponse(Status.NOT_FOUND)
+      optionString.either {
+        errorResponse(Status.BAD_REQUEST,
+          s"Unable to parse request body: $requestBody")
       }
+    }
+
+    val maybeParsedQuery: Either[Response, Document] =
+      maybeQuery.flatMap { query =>
+
+        val tryParsedQuery: Try[Document] = QueryParser.parse(query)
+
+        tryParsedQuery.either { case err: QueryAnalysisError =>
+          jsonResponse(Status.BAD_REQUEST, err.resolveError)
+        }
+      }
+
+    val maybeExecutedQuery: Either[Response, Json] =
+      maybeParsedQuery.flatMap { parsedQuery =>
+
+        val future: Future[Json] = Executor.execute(
+          schema = SchemaDef.schema,
+          queryAst = parsedQuery,
+          userContext = FalsoDB.appContext
+        )
+
+        future.either { err =>
+          errorResponse(Status.INTERNAL_ERROR, err.toString)
+        }
+      }
+
+    val maybeResponse: Either[Response, Response] =
+      maybeExecutedQuery.map { json =>
+        jsonResponse(Status.OK, json)
+      }
+
+    maybeResponse.unify
   }
 
-  server.start(Int.MaxValue, false)
+  val server: Runnable = makeServer(8080) {
+    case ("/", Method.GET, _) => handleGet
+    case ("/", Method.POST, body) => handlePost(body)
+    case ("/", _, _) => errorResponse(Status.METHOD_NOT_ALLOWED)
+    case (_, _, _) => errorResponse(Status.NOT_FOUND)
+  }
+
+  server.run()
 }
