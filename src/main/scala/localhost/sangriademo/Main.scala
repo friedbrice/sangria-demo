@@ -65,7 +65,7 @@ object Main extends App {
 
         foo.ifFailed {
           case err: ValidationError =>
-            (401, "application/json", err.resolveError.nospaces)
+            (401, "application/json", err.resolveError.toString)
           case err =>
             (500, "application/json", format(err.getMessage))
         }
@@ -73,7 +73,7 @@ object Main extends App {
 
     val finalResponse: Either[Response, Response] =
       maybeExecutedQuery.map { json =>
-        (200, "application/json", json.nospaces)
+        (200, "application/json", json.toString)
       }
 
     finalResponse.converge
