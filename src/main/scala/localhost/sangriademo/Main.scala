@@ -2,50 +2,51 @@ package localhost.sangriademo
 
 import java.io.InputStream
 
+import argonaut.Json
 import fi.iki.elonen.NanoHTTPD
+import fi.iki.elonen.NanoHTTPD.{IHTTPSession, Method, Response}
+import fi.iki.elonen.NanoHTTPD.Response.Status
+
+import scala.io.Source
 
 object Main extends App {
 
-  def handleError(status: NanoHTTPD.Response.Status): NanoHTTPD.Response =
-    NanoHTTPD.newFixedLengthResponse(
-      status,
-      "application/json",
-      s"""{"data":null,"errors":[{"message":"$status"}]}"""
+  def htmlResponse(status: Status, body: String): Response =
+    NanoHTTPD.newFixedLengthResponse(status, "text/html", body)
+
+  def jsonResponse(status: Status, json: Json): Response =
+    NanoHTTPD.newFixedLengthResponse(status, "application/json", json.toString)
+
+  def errorResponse(status: Status, msg: String = null): Response = {
+    def body = Json.obj(
+      "data" -> Json.jNull,
+      "errors" -> Json.array(
+        Json.obj(
+          "message" -> Json.jString(Option(msg).getOrElse(status.toString))
+        )
+      )
     )
 
-  val handleGet: NanoHTTPD.Response =
-    NanoHTTPD.newFixedLengthResponse(
-      NanoHTTPD.Response.Status.OK,
-      "text/html",
-      scala.io.Source.fromResource("graphiql.html").mkString
-    )
-
-  def handlePost(body: InputStream): NanoHTTPD.Response = {
-
-//    ???
-//
-//    NanoHTTPD.newFixedLengthResponse(
-//      /* status */ ???,
-//      /* mimeType */ ???,
-//      /* txt */ ???
-//    )
-
-    handleError(NanoHTTPD.Response.Status.INTERNAL_ERROR)
+    jsonResponse(status, body)
   }
+
+  val handleGet: Response =
+    htmlResponse(Status.OK, Source.fromResource("graphiql.html").mkString)
+
+  def handlePost(input: InputStream): Response = ???
 
   val server: NanoHTTPD = new NanoHTTPD(8080) {
 
-    override def serve(session: NanoHTTPD.IHTTPSession): NanoHTTPD.Response =
+    override def serve(session: IHTTPSession): Response =
       session.getUri match {
 
         case "/" => session.getMethod match {
-          case NanoHTTPD.Method.GET => handleGet
-          case NanoHTTPD.Method.POST => handlePost(session.getInputStream)
-          case _ => handleError(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED)
+          case Method.GET => handleGet
+          case Method.POST => handlePost(session.getInputStream)
+          case _ => errorResponse(Status.METHOD_NOT_ALLOWED)
         }
 
-        case _ =>
-          handleError(NanoHTTPD.Response.Status.NOT_FOUND)
+        case _ => errorResponse(Status.NOT_FOUND)
       }
   }
 
