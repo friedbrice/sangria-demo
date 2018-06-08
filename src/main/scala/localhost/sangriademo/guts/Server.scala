@@ -34,7 +34,7 @@ object Server {
           .map(scala.io.Source.fromInputStream(_).mkString)
           .getOrElse("")
 
-        val (status, contentType, content) = routes((path, method, body))
+        val (status, contentType, content) = routes( (path, method, body) )
 
         res.setStatus(status)
         res.setContentType(contentType)

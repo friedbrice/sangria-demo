@@ -28,8 +28,8 @@ object Main extends App {
       val query: String = {
         try {
           argonaut.Parse.parseOption(postBody)
-            .flatMap(json => json.field("query"))
-            .flatMap(queryField => queryField.string)
+            .flatMap { json => json.field("query") }
+            .flatMap { queryField => queryField.string }
             .get
         }
         catch {
