@@ -1,46 +1,56 @@
 package localhost.sangriademo
 
-import sangria.schema._
+import sangria.schema.{
+  Argument => GqlArgument,
+  OptionInputType => GqlOptionInputType,
+  ListInputType => GqlListInputType,
+  IntType => GqlIntType,
+  ObjectType => GqlObjectType,
+  Field => GqlField,
+  ListType => GqlListType,
+  fields => gqlFields,
+  Schema => GqlSchema
+}
 import sangria.macros.derive
 
 object SchemaDef {
 
-  lazy val itemIds: Argument[Option[Seq[Int]]] =
-    Argument(
+  lazy val itemIds: GqlArgument[Option[Seq[Int]]] =
+    GqlArgument(
       name = "itemIds",
-      argumentType = OptionInputType(ListInputType(IntType))
+      argumentType = GqlOptionInputType(GqlListInputType(GqlIntType))
     )
 
-  lazy val shopperIds: Argument[Option[Seq[Int]]] =
-    Argument(
+  lazy val shopperIds: GqlArgument[Option[Seq[Int]]] =
+    GqlArgument(
       name = "shopperIds",
-      argumentType = OptionInputType(ListInputType(IntType))
+      argumentType = GqlOptionInputType(GqlListInputType(GqlIntType))
     )
 
-  lazy val transactionIds: Argument[Option[Seq[Int]]] =
-    Argument(
+  lazy val transactionIds: GqlArgument[Option[Seq[Int]]] =
+    GqlArgument(
       name = "transactionIds",
-      argumentType = OptionInputType(ListInputType(IntType))
+      argumentType = GqlOptionInputType(GqlListInputType(GqlIntType))
     )
 
-  lazy val sinceDate: Argument[Option[Int]] =
-    Argument(
+  lazy val sinceDate: GqlArgument[Option[Int]] =
+    GqlArgument(
       name = "sinceDate",
-      argumentType = OptionInputType(IntType)
+      argumentType = GqlOptionInputType(GqlIntType)
     )
 
-  lazy val beforeDate: Argument[Option[Int]] =
-    Argument(
+  lazy val beforeDate: GqlArgument[Option[Int]] =
+    GqlArgument(
       name = "beforeDate",
-      argumentType = OptionInputType(IntType)
+      argumentType = GqlOptionInputType(GqlIntType)
     )
 
-  lazy val shopper: ObjectType[AppContext, Shopper] =
+  lazy val shopper: GqlObjectType[AppContext, Shopper] =
     derive.deriveObjectType[AppContext, Shopper](
       derive.AddFields(
-        Field(
+        GqlField(
           name = "transactions",
-          fieldType = ListType(transaction),
+          fieldType = GqlListType(transaction),
           arguments = List(sinceDate, beforeDate, itemIds),
           resolve = cc => cc.ctx.shopperTransactions(
             shopper = cc.value,
@@ -52,12 +62,12 @@ object SchemaDef {
       )
     )
 
-  lazy val item: ObjectType[AppContext, Item] =
+  lazy val item: GqlObjectType[AppContext, Item] =
     derive.deriveObjectType[AppContext, Item](
       derive.AddFields(
-        Field(
+        GqlField(
           name = "transactions",
-          fieldType = ListType(transaction),
+          fieldType = GqlListType(transaction),
           arguments = List(sinceDate, beforeDate, shopperIds),
           resolve = cc => cc.ctx.itemTransactions(
             item = cc.value,
@@ -69,49 +79,49 @@ object SchemaDef {
       )
     )
 
-  lazy val transaction: ObjectType[AppContext, Transaction] =
+  lazy val transaction: GqlObjectType[AppContext, Transaction] =
     derive.deriveObjectType[AppContext, Transaction](
       derive.ReplaceField(
         fieldName = "shopperId",
-        field = Field(
+        field = GqlField(
           name = "shopper",
           fieldType = shopper,
           resolve = cc => cc.ctx.transactionShopper(cc.value)
         )
       ),
       derive.AddFields(
-        Field(
+        GqlField(
           name = "items",
-          fieldType = ListType(item),
+          fieldType = GqlListType(item),
           resolve = cc => cc.ctx.transactionItems(cc.value)
         ),
-        Field(
+        GqlField(
           name = "total",
-          fieldType = IntType,
+          fieldType = GqlIntType,
           resolve = cc => cc.ctx.transactionTotal(cc.value)
         )
       )
     )
 
-  lazy val query: ObjectType[AppContext, Unit] =
-    ObjectType(
+  lazy val query: GqlObjectType[AppContext, Unit] =
+    GqlObjectType(
       name = "Query",
-      fields = fields[AppContext, Unit](
-        Field(
+      fields = gqlFields[AppContext, Unit](
+        GqlField(
           name = "shoppers",
-          fieldType = ListType(shopper),
+          fieldType = GqlListType(shopper),
           arguments = List(shopperIds),
           resolve = cc => cc.ctx.queryShoppers(cc.arg(shopperIds))
         ),
-        Field(
+        GqlField(
           name = "items",
-          fieldType = ListType(item),
+          fieldType = GqlListType(item),
           arguments = List(itemIds),
           resolve = cc => cc.ctx.queryItems(cc.arg(itemIds))
         ),
-        Field(
+        GqlField(
           name = "transactions",
-          fieldType = ListType(transaction),
+          fieldType = GqlListType(transaction),
           arguments =
             List(transactionIds, sinceDate, beforeDate, shopperIds, itemIds),
           resolve = cc => cc.ctx.queryTransactions(
@@ -125,5 +135,5 @@ object SchemaDef {
       )
     )
 
-  lazy val schema: Schema[AppContext, Unit] = Schema(query)
+  lazy val schema: GqlSchema[AppContext, Unit] = GqlSchema(query)
 }
