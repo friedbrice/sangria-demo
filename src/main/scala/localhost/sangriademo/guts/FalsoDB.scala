@@ -7,17 +7,17 @@ object FalsoDB {
 
   val appContext: AppContext = new AppContext {
 
-    def shopperTransactions(shopper: Shopper,
-                            sinceDate: Option[Int],
-                            beforeDate: Option[Int],
-                            itemIds: Option[Seq[Int]]): Seq[Transaction] =
+    def shopperTransactions( shopper: Shopper,
+                             sinceDate: Option[Int],
+                             beforeDate: Option[Int],
+                             itemIds: Option[Seq[Int]] ): Seq[Transaction] =
       queryTransactions(None, sinceDate, beforeDate,
         Some(List(shopper.id)), itemIds)
 
-    def itemTransactions(item: Item,
-                         sinceDate: Option[Int],
-                         beforeDate: Option[Int],
-                         shopperIds: Option[Seq[Int]]): Seq[Transaction] =
+    def itemTransactions( item: Item,
+                          sinceDate: Option[Int],
+                          beforeDate: Option[Int],
+                          shopperIds: Option[Seq[Int]] ): Seq[Transaction] =
       queryTransactions(None, sinceDate, beforeDate, None, Some(List(item.id)))
 
     override def transactionShopper(transaction: Transaction): Shopper =
@@ -42,11 +42,11 @@ object FalsoDB {
         .filter(itemIds.pred((ids, i) => ids.contains(i.id)))
         .toSeq
 
-    def queryTransactions(transactionIds: Option[Seq[Int]],
-                          sinceDate: Option[Int],
-                          beforeDate: Option[Int],
-                          shopperIds: Option[Seq[Int]],
-                          itemIds: Option[Seq[Int]]): Seq[Transaction] =
+    def queryTransactions( transactionIds: Option[Seq[Int]],
+                           sinceDate: Option[Int],
+                           beforeDate: Option[Int],
+                           shopperIds: Option[Seq[Int]],
+                           itemIds: Option[Seq[Int]] ): Seq[Transaction] =
       fakeTransactions.values
         .filter(transactionIds.pred((ids, t) => ids.contains(t.id)))
         .filter(sinceDate.pred((lower, t) => t.date >= lower))
@@ -95,7 +95,7 @@ object FalsoDB {
     }.toMap
   }
 
-  implicit class Pred[A](val self: Option[A]) extends AnyVal {
+  implicit class OptionPred[A](val self: Option[A]) extends AnyVal {
     def pred[B](p: (A, B) => Boolean)(b: B): Boolean = self match {
       case None => true
       case Some(a) => p(a, b)
