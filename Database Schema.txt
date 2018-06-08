@@ -1,11 +1,11 @@
-table: shopper
-  int id, string name
+TABLE shopper
+  INT id, STRING name
 
-table: item
-  int id, string name, int price, (string|null) description
+TABLE item
+  INT id, STRING name, INT price, (NULL|STRING) description
 
-table: transaction
-  int id, int date, int shopper.id
+TABLE transaction
+  INT id, INT date, INT shopper.id
 
-table: transaction_items
- int id, int transaction.id, int item.id
+TABLE transaction_items
+ INT id, INT transaction.id, INT item.id

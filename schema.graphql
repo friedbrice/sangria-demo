@@ -1,9 +1,10 @@
 type Shopper {
   id: Int!
   name: String!
-  transactions(sinceDate: Int,
-               beforeDate: Int,
-               itemIds: [Int!]): [Transaction!]!
+
+  transactions( sinceDate: Int,
+                beforeDate: Int,
+                itemIds: [Int!] ): [Transaction!]!
 }
 
 type Item {
@@ -11,9 +12,10 @@ type Item {
   name: String!
   price: Int!
   description: String
-  transactions(sinceDate: Int,
-               beforeDate: Int,
-               shopperIds: [Int!]): [Transaction!]!
+
+  transactions( sinceDate: Int,
+                beforeDate: Int,
+                shopperIds: [Int!] ): [Transaction!]!
 }
 
 type Transaction {
@@ -30,9 +32,9 @@ type Query {
 
   items(itemIds: [Int!]): [Item!]!
 
-  transactions(transactionIds: [Int!],
-               sinceDate: Int,
-               beforeDate: Int,
-               shopperIds: [Int!],
-               itemIds: [Int!]): [Transaction!]!
+  transactions( transactionIds: [Int!],
+                sinceDate: Int,
+                beforeDate: Int,
+                shopperIds: [Int!],
+                itemIds: [Int!] ): [Transaction!]!
 }

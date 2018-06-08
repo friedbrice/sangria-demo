@@ -18,17 +18,16 @@ object Server {
   type Request = (Path, Method, Body)
   type Response = (Status, ContentType, Content)
 
-  def serve(port: Int)
-           (routes: Request => Response): Unit = {
+  def serve(port: Int)(routes: Request => Response): Unit = {
 
     val handler = new jetty.server.handler.AbstractHandler {
-      def handle(tar: String,
-                 bas: jetty.server.Request,
-                 req: http.HttpServletRequest,
-                 res: http.HttpServletResponse): Unit = {
+      def handle( target: String,
+                  base: jetty.server.Request,
+                  req: http.HttpServletRequest,
+                  res: http.HttpServletResponse ): Unit = {
 
-        val path = bas.getOriginalURI
-        val method = bas.getMethod
+        val path = base.getOriginalURI
+        val method = base.getMethod
         val input = req.getInputStream
 
         val body = Option(input)
@@ -41,7 +40,7 @@ object Server {
         res.setContentType(contentType)
         res.getWriter.print(content)
 
-        bas.setHandled(true)
+        base.setHandled(true)
       }
     }
 
