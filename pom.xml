@@ -43,6 +43,12 @@
                 <version>2.12.6</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.argonaut</groupId>
+                <artifactId>argonaut_2.12</artifactId>
+                <version>6.2.2</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
