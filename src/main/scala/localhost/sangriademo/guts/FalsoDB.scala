@@ -1,5 +1,8 @@
-package localhost.sangriademo
+package localhost.sangriademo.guts
 
+import localhost.sangriademo._
+
+/** This file just mocks out a fake database for us. Safe to ignore. */
 object FalsoDB {
 
   val appContext: AppContext = new AppContext {

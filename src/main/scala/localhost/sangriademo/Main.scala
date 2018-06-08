@@ -2,6 +2,7 @@ package localhost.sangriademo
 
 import argonaut.Json
 import localhost.sangriademo.guts.Eithers._
+import localhost.sangriademo.guts.FalsoDB
 import sangria.ast.Document
 import sangria.execution.{Executor, QueryAnalysisError}
 import sangria.marshalling.argonaut._
