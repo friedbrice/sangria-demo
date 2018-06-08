@@ -17,31 +17,31 @@ object SchemaDef {
 
   lazy val itemIds: GqlArgument[Option[Seq[Int]]] =
     GqlArgument(
-      name = "itemIds",
+      name         = "itemIds",
       argumentType = GqlOptionInput(GqlListInput(GqlInt))
     )
 
   lazy val shopperIds: GqlArgument[Option[Seq[Int]]] =
     GqlArgument(
-      name = "shopperIds",
+      name         = "shopperIds",
       argumentType = GqlOptionInput(GqlListInput(GqlInt))
     )
 
   lazy val transactionIds: GqlArgument[Option[Seq[Int]]] =
     GqlArgument(
-      name = "transactionIds",
+      name         = "transactionIds",
       argumentType = GqlOptionInput(GqlListInput(GqlInt))
     )
 
   lazy val sinceDate: GqlArgument[Option[Int]] =
     GqlArgument(
-      name = "sinceDate",
+      name         = "sinceDate",
       argumentType = GqlOptionInput(GqlInt)
     )
 
   lazy val beforeDate: GqlArgument[Option[Int]] =
     GqlArgument(
-      name = "beforeDate",
+      name         = "beforeDate",
       argumentType = GqlOptionInput(GqlInt)
     )
 
@@ -49,14 +49,14 @@ object SchemaDef {
     derive.deriveObjectType[AppContext, Shopper](
       derive.AddFields(
         GqlField(
-          name = "transactions",
+          name      = "transactions",
           fieldType = GqlList(transaction),
           arguments = List(sinceDate, beforeDate, itemIds),
-          resolve = cc => cc.ctx.shopperTransactions(
-            shopper = cc.value,
-            sinceDate = cc.arg(sinceDate),
+          resolve   = cc => cc.ctx.shopperTransactions(
+            shopper    = cc.value,
+            sinceDate  = cc.arg(sinceDate),
             beforeDate = cc.arg(beforeDate),
-            itemIds = cc.arg(itemIds)
+            itemIds    = cc.arg(itemIds)
           )
         )
       )
@@ -66,12 +66,12 @@ object SchemaDef {
     derive.deriveObjectType[AppContext, Item](
       derive.AddFields(
         GqlField(
-          name = "transactions",
+          name      = "transactions",
           fieldType = GqlList(transaction),
           arguments = List(sinceDate, beforeDate, shopperIds),
-          resolve = cc => cc.ctx.itemTransactions(
-            item = cc.value,
-            sinceDate = cc.arg(sinceDate),
+          resolve   = cc => cc.ctx.itemTransactions(
+            item       = cc.value,
+            sinceDate  = cc.arg(sinceDate),
             beforeDate = cc.arg(beforeDate),
             shopperIds = cc.arg(shopperIds)
           )
@@ -83,53 +83,53 @@ object SchemaDef {
     derive.deriveObjectType[AppContext, Transaction](
       derive.ReplaceField(
         fieldName = "shopperId",
-        field = GqlField(
-          name = "shopper",
+        field     = GqlField(
+          name      = "shopper",
           fieldType = shopper,
-          resolve = cc => cc.ctx.transactionShopper(cc.value)
+          resolve   = cc => cc.ctx.transactionShopper(cc.value)
         )
       ),
       derive.AddFields(
         GqlField(
-          name = "items",
+          name      = "items",
           fieldType = GqlList(item),
-          resolve = cc => cc.ctx.transactionItems(cc.value)
+          resolve   = cc => cc.ctx.transactionItems(cc.value)
         ),
         GqlField(
-          name = "total",
+          name      = "total",
           fieldType = GqlInt,
-          resolve = cc => cc.ctx.transactionTotal(cc.value)
+          resolve   = cc => cc.ctx.transactionTotal(cc.value)
         )
       )
     )
 
   lazy val query: GqlObject[AppContext, Unit] =
     GqlObject(
-      name = "Query",
+      name   = "Query",
       fields = gqlFields[AppContext, Unit](
         GqlField(
-          name = "shoppers",
+          name      = "shoppers",
           fieldType = GqlList(shopper),
           arguments = List(shopperIds),
-          resolve = cc => cc.ctx.queryShoppers(cc.arg(shopperIds))
+          resolve   = cc => cc.ctx.queryShoppers(cc.arg(shopperIds))
         ),
         GqlField(
-          name = "items",
+          name      = "items",
           fieldType = GqlList(item),
           arguments = List(itemIds),
-          resolve = cc => cc.ctx.queryItems(cc.arg(itemIds))
+          resolve   = cc => cc.ctx.queryItems(cc.arg(itemIds))
         ),
         GqlField(
-          name = "transactions",
+          name      = "transactions",
           fieldType = GqlList(transaction),
           arguments =
             List(transactionIds, sinceDate, beforeDate, shopperIds, itemIds),
-          resolve = cc => cc.ctx.queryTransactions(
+          resolve   = cc => cc.ctx.queryTransactions(
             transactionIds = cc.arg(transactionIds),
-            sinceDate = cc.arg(sinceDate),
-            beforeDate = cc.arg(beforeDate),
-            shopperIds = cc.arg(shopperIds),
-            itemIds = cc.arg(itemIds)
+            sinceDate      = cc.arg(sinceDate),
+            beforeDate     = cc.arg(beforeDate),
+            shopperIds     = cc.arg(shopperIds),
+            itemIds        = cc.arg(itemIds)
           )
         )
       )
