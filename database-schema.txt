@@ -7,5 +7,5 @@ TABLE item
 TABLE transaction
   INT id, INT date, INT shopper.id
 
-TABLE transaction_items
+TABLE transaction_item
  INT id, INT transaction.id, INT item.id

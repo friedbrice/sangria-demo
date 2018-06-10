@@ -11,8 +11,8 @@ object FalsoDB {
                              sinceDate: Option[Int],
                              beforeDate: Option[Int],
                              itemIds: Option[Seq[Int]] ): Seq[Transaction] =
-      queryTransactions(None, sinceDate, beforeDate,
-        Some(List(shopper.id)), itemIds)
+      queryTransactions( None, sinceDate, beforeDate,
+                         Some(List(shopper.id)), itemIds )
 
     def itemTransactions( item: Item,
                           sinceDate: Option[Int],
@@ -25,8 +25,8 @@ object FalsoDB {
 
     def transactionItems(transaction: Transaction): Seq[Item] =
       fakeTransactionItems.values
-        .filter(ti => ti.transactionId == transaction.id)
-        .map(ti => fakeItems(ti.itemId))
+        .filter { ti => ti.transactionId == transaction.id }
+        .map { ti => fakeItems(ti.itemId) }
         .toSeq
 
     def transactionTotal(transaction: Transaction): Int =
@@ -34,12 +34,12 @@ object FalsoDB {
 
     def queryShoppers(shopperIds: Option[Seq[Int]]): Seq[Shopper] =
       fakeShoppers.values
-        .filter(shopperIds.pred((ids, s) => ids.contains(s.id)))
+        .filter(shopperIds.pred { (ids, s) => ids.contains(s.id) })
         .toSeq
 
     def queryItems(itemIds: Option[Seq[Int]]): Seq[Item] =
       fakeItems.values
-        .filter(itemIds.pred((ids, i) => ids.contains(i.id)))
+        .filter(itemIds.pred { (ids, i) => ids.contains(i.id) })
         .toSeq
 
     def queryTransactions( transactionIds: Option[Seq[Int]],
@@ -48,13 +48,13 @@ object FalsoDB {
                            shopperIds: Option[Seq[Int]],
                            itemIds: Option[Seq[Int]] ): Seq[Transaction] =
       fakeTransactions.values
-        .filter(transactionIds.pred((ids, t) => ids.contains(t.id)))
-        .filter(sinceDate.pred((lower, t) => t.date >= lower))
-        .filter(beforeDate.pred((upper, t) => t.date < upper))
-        .filter(shopperIds.pred((sids, t) => sids.contains(t.shopperId)))
-        .filter(itemIds.pred((iids, t) =>
-          transactionItems(t).exists(item => iids.contains(item.id))))
-        .toSeq
+        .filter(transactionIds.pred { (tIds, t) => tIds.contains(t.id) })
+        .filter(sinceDate.pred { (lower, t) => t.date >= lower })
+        .filter(beforeDate.pred { (upper, t) => t.date < upper })
+        .filter(shopperIds.pred { (sIds, t) => sIds.contains(t.shopperId) })
+        .filter(itemIds.pred { (iIds, t) =>
+          transactionItems(t).exists { item => iIds.contains(item.id) }
+        }).toSeq
   }
 
   val fakeShoppers: Map[Int, Shopper] = Map(
@@ -77,8 +77,8 @@ object FalsoDB {
 
   val fakeTransactions: Map[Int, Transaction] = {
     val ids = 0 to 20
-    val dates = ids.map(_ => math.abs(scala.util.Random.nextInt)).sorted
-    val shoppers = ids.map(_ => scala.util.Random.shuffle(0 to 5).head)
+    val dates = ids.map { _ => math.abs(scala.util.Random.nextInt) }.sorted
+    val shoppers = ids.map { _ => scala.util.Random.shuffle(0 to 5).head }
 
     (ids zip dates zip shoppers).map {
       case ((id, d), s) => (id, Transaction(id, d, s))
@@ -87,8 +87,8 @@ object FalsoDB {
 
   val fakeTransactionItems: Map[Int, TransactionItem] = {
     val ids = 0 to 55
-    val transactions = ids.map(_ => scala.util.Random.shuffle(0 to 20).head)
-    val items = ids.map(_ => scala.util.Random.shuffle(0 to 5).head)
+    val transactions = ids.map { _ => scala.util.Random.shuffle(0 to 20).head }
+    val items = ids.map { _ => scala.util.Random.shuffle(0 to 5).head }
 
     (ids zip transactions zip items).map {
       case ((id, t), i) => (id, TransactionItem(id, t, i))
