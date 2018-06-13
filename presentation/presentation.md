@@ -1,7 +1,7 @@
 ---
 title: GraphQL and Sangria
 subtitle: How to get a GraphQL API Server Up and Running
-date: 5 March 2018
+date: 12 June 2018
 author:
   - Daniel Brice, CJ Affiliate (dbrice@cj.com)
   - David Ron, Pay Junction
