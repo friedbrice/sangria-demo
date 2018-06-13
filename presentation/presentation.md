@@ -195,14 +195,14 @@ type Query {
 ## Executing GraphQL Queries
 
 ```scala
-// Global constant.
-val schema: Schema[DAO, Unit] = ...
-
-// Create in response to incoming request.
-val : DAO = ...
-
 // Contained in POST body of incoming request.
 val unparsedQuery: String = ...
+
+// Create in response to incoming request.
+val dao: DAO = ...
+
+// Global constant.
+val schema: Schema[DAO, Unit] = ...
 
 // May contain a SyntaxError
 val parsedQuery: Try[Document] = QueryParser.parse(unparsedQuery)
@@ -484,7 +484,7 @@ case class Bar( id:   Int,
 
 trait DAO {
   def fooBar(foo: Foo): Bar
-  def barFoos(bar: Bar): Foo
+  def barFoos(bar: Bar): Seq[Foo]
 }
 ```
 
@@ -508,9 +508,9 @@ lazy val bar: GqlObject[DAO, Bar] =
   deriveObjectType[DAO, Bar](
     AddFields(
       GqlField(
-        name =      "foos",
+        name      = "foos",
         fieldType = GqlList(foo),
-        resolve =   cc =>
+        resolve   = cc =>
           cc.ctx.barFoos(cc.value)
       )
     )
