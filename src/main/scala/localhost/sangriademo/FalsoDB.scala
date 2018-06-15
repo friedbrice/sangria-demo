@@ -2,12 +2,13 @@ package localhost.sangriademo
 
 import sangria.schema.Action
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 import scala.util.Random
 
 object FalsoDB {
 
-  def context(authToken: Option[String]): Context = new Context {
+  def context(authToken: Option[String])
+             (implicit ec: ExecutionContext): Context = new Context {
 
     def shopperTransactions( shopper: Shopper,
                              sinceDate: Option[Int],
