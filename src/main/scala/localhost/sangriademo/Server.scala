@@ -18,9 +18,7 @@ object Server {
         val path = req.getRequestURI
         val method = req.getMethod
         val token = Option(req.getHeader("Authorization"))
-        val body = Option(req.getInputStream)
-          .map(Source.fromInputStream(_).mkString)
-          .getOrElse("")
+        val body = Source.fromInputStream(req.getInputStream).mkString
 
         val (status, contentType, content) = routes((path, method, body, token))
 
