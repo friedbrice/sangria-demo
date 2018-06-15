@@ -1,7 +1,6 @@
 package localhost.sangriademo
 
 import argonaut.Json
-import Eithers._
 import sangria.execution.{Executor, ValidationError}
 import sangria.marshalling.argonaut._
 import sangria.parser.{QueryParser, SyntaxError}

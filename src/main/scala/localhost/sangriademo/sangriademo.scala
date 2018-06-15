@@ -2,6 +2,10 @@ package localhost
 
 import sangria.schema.Action
 
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.Duration
+import scala.util.Try
+
 package object sangriademo {
 
   type Path = String
@@ -69,5 +73,23 @@ package object sangriademo {
                            shopperIds: Option[Seq[Int]],
                            itemIds: Option[Seq[Int]]
                          ): Action[Context, Seq[Transaction]]
+  }
+
+  implicit class CatchFuture[A](val self: Future[A]) extends AnyVal {
+    def `catch`[E](await: Duration)(f: Throwable => E): Either[E, A] =
+      Try(Await.result(self, await)).`catch`(f)
+  }
+
+  implicit class CatchTry[A](val self: Try[A]) extends AnyVal {
+    def `catch`[E](f: Throwable => E): Either[E, A] =
+      self.toEither.left.map(f)
+  }
+
+  implicit class CatchOption[A](val self: Option[A]) extends AnyVal {
+    def `catch`[E](f: => E): Either[E, A] = self.toRight(f)
+  }
+
+  implicit class ConvergeEither[A](val self: Either[A, A]) extends AnyVal {
+    def converge: A = self.fold(identity, identity)
   }
 }
