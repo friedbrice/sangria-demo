@@ -1,6 +1,5 @@
-package localhost.sangriademo.guts
+package localhost.sangriademo
 
-import localhost.sangriademo._
 import sangria.schema.Action
 
 import scala.concurrent.ExecutionContext.Implicits.global

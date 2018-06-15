@@ -1,5 +1,4 @@
 package localhost.sangriademo
-package guts
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}

@@ -1,8 +1,7 @@
 package localhost.sangriademo
 
 import argonaut.Json
-import localhost.sangriademo.guts.Eithers._
-import localhost.sangriademo.guts.FalsoDB
+import Eithers._
 import sangria.execution.{Executor, ValidationError}
 import sangria.marshalling.argonaut._
 import sangria.parser.{QueryParser, SyntaxError}
@@ -14,7 +13,7 @@ import scala.concurrent.duration._
 
 object Main extends App {
 
-  import localhost.sangriademo.guts.Server._
+  import Server._
 
   def format(msg: String): String = Json(
     "data" -> Json.jNull,

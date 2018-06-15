@@ -1,5 +1,4 @@
 package localhost.sangriademo
-package guts
 
 import javax.servlet.http
 import org.eclipse.jetty
