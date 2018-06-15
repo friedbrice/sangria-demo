@@ -15,8 +15,8 @@ object Server {
                   req: http.HttpServletRequest,
                   res: http.HttpServletResponse ): Unit = {
 
-        val path = base.getOriginalURI
-        val method = base.getMethod
+        val path = req.getRequestURI
+        val method = req.getMethod
         val token = Option(req.getHeader("Authorization"))
         val body = Option(req.getInputStream)
           .map(Source.fromInputStream(_).mkString)
