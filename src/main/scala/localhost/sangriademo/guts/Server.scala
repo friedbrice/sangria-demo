@@ -6,7 +6,6 @@ import org.eclipse.jetty
 
 import scala.io.Source
 
-/** This file is some standard embedded Jetty. Safe to ignore. */
 object Server {
 
   type Path = String

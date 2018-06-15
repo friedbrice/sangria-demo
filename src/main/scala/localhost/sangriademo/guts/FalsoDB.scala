@@ -3,7 +3,9 @@ package localhost.sangriademo.guts
 import localhost.sangriademo._
 import sangria.schema.Action
 
-/** This file just mocks out a fake database for us. Safe to ignore. */
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Random
+
 object FalsoDB {
 
   val appContext: AppContext = new AppContext {
@@ -83,28 +85,20 @@ object FalsoDB {
 
   val fakeTransactions: IndexedSeq[Transaction] = {
     val ids = 0 to 127
-    val dates = ids.map { _ => math.abs(scala.util.Random.nextInt) }.sorted
-    val shoppers = ids.map { _ => scala.util.Random.shuffle(0 to 5).head }
-
-    (ids zip dates zip shoppers).map {
-      case ((id, d), s) => Transaction(id, d, s)
-    }
+    val dates = ids.map { _ => math.abs(Random.nextInt) }.sorted
+    val shoppers = ids.map { _ => Random.shuffle(0 to 5).head }
+    (ids, dates, shoppers).zipped.map(Transaction)
   }
 
   val fakeTransactionItems: IndexedSeq[TransactionItem] = {
     val ids = 0 to 255
-    val transactions = ids.map { _ => scala.util.Random.shuffle(0 to 20).head }
-    val items = ids.map { _ => scala.util.Random.shuffle(0 to 5).head }
-
-    (ids zip transactions zip items).map {
-      case ((id, t), i) => TransactionItem(id, t, i)
-    }
+    val transactions = ids.map { _ => Random.shuffle(fakeTransactions).head.id }
+    val items = ids.map { _ => Random.shuffle(0 to 5).head }
+    (ids, transactions, items).zipped.map(TransactionItem)
   }
 
   implicit class OptionPred[A](val self: Option[A]) extends AnyVal {
-    def pred[B](p: (A, B) => Boolean)(b: B): Boolean = self match {
-      case None => true
-      case Some(a) => p(a, b)
-    }
+    def pred[B](p: (A, B) => Boolean)(b: B): Boolean =
+      self.fold(true) { a => p(a, b) }
   }
 }
