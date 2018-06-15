@@ -41,7 +41,7 @@ object Main extends App {
       queryAst    = parsedQuery,
       schema      = SchemaDef.schema,
       userContext = FalsoDB.appContext
-    ).`catch`(await = Duration.Inf) {
+    ).`catch`(await = 1.minute) {
       case err: ValidationError =>
         (401, "application/json", err.resolveError.toString)
       case _: TimeoutException =>
