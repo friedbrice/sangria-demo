@@ -45,8 +45,8 @@ object SchemaDef {
       argumentType = GqlOptionInput(GqlInt)
     )
 
-  lazy val shopper: GqlObject[AppContext, Shopper] =
-    derive.deriveObjectType[AppContext, Shopper](
+  lazy val shopper: GqlObject[Context, Shopper] =
+    derive.deriveObjectType[Context, Shopper](
       derive.AddFields(
         GqlField(
           name      = "transactions",
@@ -62,8 +62,8 @@ object SchemaDef {
       )
     )
 
-  lazy val item: GqlObject[AppContext, Item] =
-    derive.deriveObjectType[AppContext, Item](
+  lazy val item: GqlObject[Context, Item] =
+    derive.deriveObjectType[Context, Item](
       derive.AddFields(
         GqlField(
           name      = "transactions",
@@ -79,8 +79,8 @@ object SchemaDef {
       )
     )
 
-  lazy val transaction: GqlObject[AppContext, Transaction] =
-    derive.deriveObjectType[AppContext, Transaction](
+  lazy val transaction: GqlObject[Context, Transaction] =
+    derive.deriveObjectType[Context, Transaction](
       derive.ReplaceField(
         fieldName = "shopperId",
         field     = GqlField(
@@ -103,10 +103,10 @@ object SchemaDef {
       )
     )
 
-  lazy val query: GqlObject[AppContext, Unit] =
+  lazy val query: GqlObject[Context, Unit] =
     GqlObject(
       name   = "Query",
-      fields = gqlFields[AppContext, Unit](
+      fields = gqlFields[Context, Unit](
         GqlField(
           name      = "shoppers",
           fieldType = GqlList(shopper),
@@ -135,5 +135,5 @@ object SchemaDef {
       )
     )
 
-  lazy val schema: GqlSchema[AppContext, Unit] = GqlSchema(query)
+  lazy val schema: GqlSchema[Context, Unit] = GqlSchema(query)
 }

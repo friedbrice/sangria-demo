@@ -8,13 +8,13 @@ import scala.util.Random
 
 object FalsoDB {
 
-  def context(authToken: Option[String]): AppContext = new AppContext {
+  def context(authToken: Option[String]): Context = new Context {
 
     def shopperTransactions( shopper: Shopper,
                              sinceDate: Option[Int],
                              beforeDate: Option[Int],
                              itemIds: Option[Seq[Int]]
-                           ): Action[AppContext, Seq[Transaction]] =
+                           ): Action[Context, Seq[Transaction]] =
       queryTransactions( None, sinceDate, beforeDate,
                          Some(List(shopper.id)), itemIds )
 
@@ -22,29 +22,29 @@ object FalsoDB {
                           sinceDate: Option[Int],
                           beforeDate: Option[Int],
                           shopperIds: Option[Seq[Int]]
-                        ): Action[AppContext, Seq[Transaction]] =
+                        ): Action[Context, Seq[Transaction]] =
       queryTransactions(None, sinceDate, beforeDate, None, Some(List(item.id)))
 
     override def transactionShopper( transaction: Transaction
-                                   ): Action[AppContext, Shopper] =
+                                   ): Action[Context, Shopper] =
       fakeShoppers(transaction.shopperId)
 
     def transactionItems( transaction: Transaction
-                        ): Action[AppContext, Seq[Item]] =
+                        ): Action[Context, Seq[Item]] =
       fakeTransactionItems
         .filter { ti => ti.transactionId == transaction.id }
         .map { ti => fakeItems(ti.itemId) }
 
     def transactionTotal( transaction: Transaction
-                        ): Action[AppContext, Int] =
+                        ): Action[Context, Int] =
       transactionItems(transaction).map { items => items.map(_.price).sum }
 
     def queryShoppers( shopperIds: Option[Seq[Int]]
-                     ): Action[AppContext, Seq[Shopper]] =
+                     ): Action[Context, Seq[Shopper]] =
       fakeShoppers.filter(shopperIds.pred { (ids, s) => ids.contains(s.id) })
 
     def queryItems( itemIds: Option[Seq[Int]]
-                  ): Action[AppContext, Seq[Item]] =
+                  ): Action[Context, Seq[Item]] =
       fakeItems.filter(itemIds.pred { (ids, i) => ids.contains(i.id) })
 
     def queryTransactions( transactionIds: Option[Seq[Int]],
@@ -52,7 +52,7 @@ object FalsoDB {
                            beforeDate: Option[Int],
                            shopperIds: Option[Seq[Int]],
                            itemIds: Option[Seq[Int]]
-                         ): Action[AppContext, Seq[Transaction]] =
+                         ): Action[Context, Seq[Transaction]] =
       fakeTransactions
         .filter(transactionIds.pred { (tIds, t) => tIds.contains(t.id) })
         .filter(sinceDate.pred { (lower, t) => t.date >= lower })

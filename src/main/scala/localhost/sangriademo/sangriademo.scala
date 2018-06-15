@@ -34,40 +34,40 @@ package object sangriademo {
                               transactionId: Int,
                               itemId: Int )
 
-  trait AppContext {
+  trait Context {
 
     def shopperTransactions( shopper: Shopper,
                              sinceDate: Option[Int],
                              beforeDate: Option[Int],
                              itemIds: Option[Seq[Int]]
-                           ): Action[AppContext, Seq[Transaction]]
+                           ): Action[Context, Seq[Transaction]]
 
     def itemTransactions( item: Item,
                           sinceDate: Option[Int],
                           beforeDate: Option[Int],
                           shopperIds: Option[Seq[Int]]
-                        ): Action[AppContext, Seq[Transaction]]
+                        ): Action[Context, Seq[Transaction]]
 
     def transactionShopper( transaction: Transaction
-                          ): Action[AppContext, Shopper]
+                          ): Action[Context, Shopper]
 
     def transactionItems( transaction: Transaction
-                        ): Action[AppContext, Seq[Item]]
+                        ): Action[Context, Seq[Item]]
 
     def transactionTotal( transaction: Transaction
-                        ): Action[AppContext, Int]
+                        ): Action[Context, Int]
 
     def queryShoppers( shopperIds: Option[Seq[Int]]
-                     ): Action[AppContext, Seq[Shopper]]
+                     ): Action[Context, Seq[Shopper]]
 
     def queryItems( itemIds: Option[Seq[Int]]
-                  ): Action[AppContext, Seq[Item]]
+                  ): Action[Context, Seq[Item]]
 
     def queryTransactions( transactionIds: Option[Seq[Int]],
                            sinceDate: Option[Int],
                            beforeDate: Option[Int],
                            shopperIds: Option[Seq[Int]],
                            itemIds: Option[Seq[Int]]
-                         ): Action[AppContext, Seq[Transaction]]
+                         ): Action[Context, Seq[Transaction]]
   }
 }
