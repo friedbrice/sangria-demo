@@ -1,5 +1,7 @@
 package localhost.sangriademo
 
+import sangria.schema.Action
+
 case class Shopper( id: Int,
                     name: String )
 
@@ -21,26 +23,34 @@ trait AppContext {
   def shopperTransactions( shopper: Shopper,
                            sinceDate: Option[Int],
                            beforeDate: Option[Int],
-                           itemIds: Option[Seq[Int]] ): Seq[Transaction]
+                           itemIds: Option[Seq[Int]]
+                         ): Action[AppContext, Seq[Transaction]]
 
   def itemTransactions( item: Item,
                         sinceDate: Option[Int],
                         beforeDate: Option[Int],
-                        shopperIds: Option[Seq[Int]] ): Seq[Transaction]
+                        shopperIds: Option[Seq[Int]]
+                      ): Action[AppContext, Seq[Transaction]]
 
-  def transactionShopper(transaction: Transaction): Shopper
+  def transactionShopper( transaction: Transaction
+                        ): Action[AppContext, Shopper]
 
-  def transactionItems(transaction: Transaction): Seq[Item]
+  def transactionItems( transaction: Transaction
+                      ): Action[AppContext, Seq[Item]]
 
-  def transactionTotal(transaction: Transaction): Int
+  def transactionTotal( transaction: Transaction
+                      ): Action[AppContext, Int]
 
-  def queryShoppers(shopperIds: Option[Seq[Int]]): Seq[Shopper]
+  def queryShoppers( shopperIds: Option[Seq[Int]]
+                   ): Action[AppContext, Seq[Shopper]]
 
-  def queryItems(itemIds: Option[Seq[Int]]): Seq[Item]
+  def queryItems( itemIds: Option[Seq[Int]]
+                ): Action[AppContext, Seq[Item]]
 
   def queryTransactions( transactionIds: Option[Seq[Int]],
                          sinceDate: Option[Int],
                          beforeDate: Option[Int],
                          shopperIds: Option[Seq[Int]],
-                         itemIds: Option[Seq[Int]] ): Seq[Transaction]
+                         itemIds: Option[Seq[Int]]
+                       ): Action[AppContext, Seq[Transaction]]
 }

@@ -4,6 +4,8 @@ package guts
 import javax.servlet.http
 import org.eclipse.jetty
 
+import scala.io.Source
+
 /** This file is some standard embedded Jetty. Safe to ignore. */
 object Server {
 
@@ -31,7 +33,7 @@ object Server {
         val input = req.getInputStream
 
         val body = Option(input)
-          .map(scala.io.Source.fromInputStream(_).mkString)
+          .map(Source.fromInputStream(_).mkString)
           .getOrElse("")
 
         val (status, contentType, content) = routes( (path, method, body) )
