@@ -75,12 +75,54 @@ object FalsoDB {
   )
 
   val fakeItems: IndexedSeq[Item] = IndexedSeq(
-    Item(0, "Scala for the Impatient", 3540, Some("Interest in the Scala programming language continues to grow for many reasons. Scala embraces the functional programming style without abandoning the object-oriented paradigm, and it allows you to write programs more concisely than in Java. Because Scala runs on the JVM, it can access any Java library and is interoperable with familiar Java frameworks. Scala also makes it easier to leverage the full power of concurrency.")),
-    Item(1, "Structure and Interpretation of Computer Programs", 4709, Some("Structure and Interpretation of Computer Programs has had a dramatic impact on computer science curricula over the past decade.")),
-    Item(2, "Design Patterns: Elements of Reusable Object-Oriented Software", 2785, Some("Capturing a wealth of experience about the design of object-oriented software, four top-notch designers present a catalog of simple and succinct solutions to commonly occurring design problems. Previously undocumented, these 23 patterns allow designers to create more flexible, elegant, and ultimately reusable designs without having to rediscover the design solutions themselves.")),
+    Item(0, "Scala for the Impatient", 3540, Some(
+      """Interest in the Scala programming language continues to grow for many
+        | reasons. Scala embraces the functional programming style without
+        | abandoning the object-oriented paradigm, and it allows you to write
+        | programs more concisely than in Java. Because Scala runs on the JVM,
+        | it can access any Java library and is interoperable with familiar Java
+        | frameworks. Scala also makes it easier to leverage the full power of
+        | concurrency.
+        |""".stripMargin
+    )),
+    Item(1, "Structure and Interpretation of Computer Programs", 4709, Some(
+      """Structure and Interpretation of Computer Programs has had a dramatic
+        | impact on computer science curricula over the past decade. This
+        | long-awaited revision contains changes throughout the text. There are
+        | new implementations of most of the major programming systems in the
+        | book, including the interpreters and compilers, and the authors have
+        | incorporated many small changes that reflect their experience teaching
+        | the course at MIT since the first edition was published.
+        |""".stripMargin
+    )),
+    Item(2,
+      "Design Patterns: Elements of Reusable Object-Oriented Software",
+      2785,
+      Some(
+        """Capturing a wealth of experience about the design of object-oriented
+          | software, four top-notch designers present a catalog of simple and
+          | succinct solutions to commonly occurring design problems. Previously
+          | undocumented, these 23 patterns allow designers to create more
+          | flexible, elegant, and ultimately reusable designs without having to
+          | rediscover the design solutions themselves.
+          |""".stripMargin
+      )
+    ),
     Item(3, "Learn You a Haskell for Great Good", 3804, None),
     Item(4, "Scala with Cats", 0, None),
-    Item(5, "The Cathedral and the Bazaar", 1231, Some("Open source provides the competitive advantage in the Internet Age. According to the August Forrester Report, 56 percent of IT managers interviewed at Global 2,500 companies are already using some type of open source software in their infrastructure and another 6 percent will install it in the next two years. This revolutionary model for collaborative software development is being embraced and studied by many of the biggest players in the high-tech industry, from Sun Microsystems to IBM to Intel.The Cathedral & the Bazaar is a must for anyone who cares about the future of the computer industry or the dynamics of the information economy."))
+    Item(5, "The Cathedral and the Bazaar", 1231, Some(
+      """Open source provides the competitive advantage in the Internet Age.
+        | According to the August Forrester Report, 56 percent of IT managers
+        | interviewed at Global 2,500 companies are already using some type of
+        | open source software in their infrastructure and another 6 percent
+        | will install it in the next two years. This revolutionary model for
+        | collaborative software development is being embraced and studied by
+        | many of the biggest players in the high-tech industry, from Sun
+        | Microsystems to IBM to Intel. The Cathedral & the Bazaar is a must for
+        | anyone who cares about the future of the computer industry or the
+        | dynamics of the information economy.
+        |""".stripMargin
+    ))
   )
 
   val fakeTransactions: IndexedSeq[Transaction] = {
