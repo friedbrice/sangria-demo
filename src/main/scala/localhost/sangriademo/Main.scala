@@ -31,8 +31,10 @@ object Main extends App {
       }
 
     parsedQuery <- QueryParser.parse(query).`catch` {
+
       case err: SyntaxError =>
         (401, "application/json", format(err.getMessage))
+
       case err =>
         (500, "application/json", format(err.getMessage))
     }
@@ -42,13 +44,17 @@ object Main extends App {
       schema      = SchemaDef.schema,
       userContext = FalsoDB.context(authToken)
     ).`catch`(await = 1.minute) {
+
       case err: ValidationError =>
         (401, "application/json", err.resolveError.toString)
+
       case err: AuthError =>
         (403, "application/json", format(err.getMessage))
+
       case _: TimeoutException =>
         val msg = "Computational limit reached, please refine your query."
         (403, "application/json", format(msg))
+
       case err =>
         (500, "application/json", format(err.getMessage))
     }
@@ -57,9 +63,17 @@ object Main extends App {
   val graphIql: String = Source.fromResource("srv/graphiql.html").mkString
 
   serve(port = 8080) {
-    case ("/", "GET", _, _)         => (200, "text/html", graphIql)
-    case ("/", "POST", body, token) => handlePost(body, token).converge
-    case ("/", _, _, _)             => (405, "text/plain", "METHOD NOT ALLOWED")
-    case (_, _, _, _)               => (404, "text/plain", "NOT FOUND")
+
+    case ("/", "GET", _, _) =>
+      (200, "text/html", graphIql)
+
+    case ("/", "POST", body, token) =>
+      handlePost(body, token).converge
+
+    case ("/", _, _, _) =>
+      (405, "text/plain", "METHOD NOT ALLOWED")
+
+    case (_, _, _, _) =>
+      (404, "text/plain", "NOT FOUND")
   }
 }
