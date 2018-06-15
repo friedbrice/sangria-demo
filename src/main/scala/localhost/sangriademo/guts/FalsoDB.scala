@@ -8,7 +8,7 @@ import scala.util.Random
 
 object FalsoDB {
 
-  val appContext: AppContext = new AppContext {
+  def context(authToken: Option[String]): AppContext = new AppContext {
 
     def shopperTransactions( shopper: Shopper,
                              sinceDate: Option[Int],

@@ -18,13 +18,12 @@ object Server {
 
         val path = base.getOriginalURI
         val method = base.getMethod
-        val input = req.getInputStream
-
-        val body = Option(input)
+        val token = Option(req.getHeader("Authorization"))
+        val body = Option(req.getInputStream)
           .map(Source.fromInputStream(_).mkString)
           .getOrElse("")
 
-        val (status, contentType, content) = routes( (path, method, body) )
+        val (status, contentType, content) = routes((path, method, body, token))
 
         res.setStatus(status)
         res.setContentType(contentType)

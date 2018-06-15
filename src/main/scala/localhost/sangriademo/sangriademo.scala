@@ -16,6 +16,7 @@ package object sangriademo {
   type Request = (Path, Method, Body, Option[AuthToken])
   type Response = (Status, ContentType, Content)
 
+  case class AuthError(message: String) extends Exception(message)
 
   case class Shopper( id: Int,
                       name: String )
