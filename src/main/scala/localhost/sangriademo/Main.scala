@@ -1,7 +1,7 @@
 package localhost.sangriademo
 
 import argonaut.Json
-import sangria.execution.{Executor, ValidationError}
+import sangria.execution.{ErrorWithResolver, Executor}
 import sangria.marshalling.argonaut._
 import sangria.parser.{QueryParser, SyntaxError}
 
@@ -45,7 +45,7 @@ object Main extends App {
       userContext = FalsoDB.context(authToken)
     ).`catch`(await = 1.minute) {
 
-      case err: ValidationError =>
+      case err: ErrorWithResolver =>
         (401, "application/json", err.resolveError.toString)
 
       case err: AuthError =>
