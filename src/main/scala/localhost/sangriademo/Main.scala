@@ -1,9 +1,15 @@
 package localhost.sangriademo
 
 import argonaut.Json
-import sangria.execution.{ErrorWithResolver, Executor}
+import sangria.execution.{
+  ErrorWithResolver => SangriaErrorWithResolver,
+  Executor          => SangriaExecutor
+}
 import sangria.marshalling.argonaut._
-import sangria.parser.{QueryParser, SyntaxError}
+import sangria.parser.{
+  QueryParser => SangriaQueryParser,
+  SyntaxError => SangriaSyntaxError
+}
 
 import scala.io.Source
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,22 +36,22 @@ object Main extends App {
         (401, "application/json", format(msg))
       }
 
-    parsedQuery <- QueryParser.parse(query).`catch` {
+    parsedQuery <- SangriaQueryParser.parse(query).`catch` {
 
-      case err: SyntaxError =>
+      case err: SangriaSyntaxError =>
         (401, "application/json", format(err.getMessage))
 
       case err =>
         (500, "application/json", format(err.getMessage))
     }
 
-    executedQuery <- Executor.execute(
+    executedQuery <- SangriaExecutor.execute(
       queryAst    = parsedQuery,
       schema      = SchemaDef.schema,
       userContext = FalsoDB.context(authToken)
     ).`catch`(await = 1.minute) {
 
-      case err: ErrorWithResolver =>
+      case err: SangriaErrorWithResolver =>
         (401, "application/json", err.resolveError.toString)
 
       case err: AuthError =>
