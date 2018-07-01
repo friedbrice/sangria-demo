@@ -1,17 +1,13 @@
 ---
-title: GraphQL and Sangria
-subtitle: How to get a GraphQL API Server Up and Running
-date: 5 March 2018
+title: Delivering GraphQL Services Using Sangria
+subtitle: Los Angeles Scala Users Group
+date: 27 June 2018
 author:
   - Daniel Brice, CJ Affiliate (dbrice@cj.com)
-  - David Ron, Pay Junction
-institute:
-  - CJ Affiliate, Santa Barbara, California
-  - Pay Junction, Santa Barbara, California
 theme: default
 colortheme: beaver
 classoption:
-  - aspectratio=169
+  - aspectratio=1610
   - 10pt
 fonttheme: serif
 fontthemeoptions:
@@ -21,6 +17,10 @@ fontthemeoptions:
 # Designing Your GraphQL Schema
 
 ## Designing Your GraphQL Schema (1)
+
+![GraphQL Schema Definition Language](graphql-sdl.png)
+
+## Designing Your GraphQL Schema (2)
 
 :::::: {.columns}
 ::: {.column width="50%"}
@@ -48,48 +48,6 @@ type Foo {
     id:    Int!
     name:  String!
     barId: Int!
-}
-type Bar {
-    id:   Int!
-    name: String!
-}
-type Query {
-    foos: [Foo!]!
-    bars: [Bar!]!
-}
-```
-
-:::
-::::::
-
-## Designing Your GraphQL Schema (2)
-
-:::::: {.columns}
-::: {.column width="50%"}
-
-### Database Layout
-
-```
-TABLE foo
-    INT    id,
-    STRING name,
-    INT    bar.id
-
-TABLE bar
-    INT    id,
-    STRING name
-```
-
-:::
-::: {.column width="50%"}
-
-### GraphQL Schema
-
-```graphql
-type Foo {
-    id:   Int!
-    name: String!
-    bar:  Bar!
 }
 type Bar {
     id:   Int!
@@ -136,7 +94,6 @@ type Foo {
 type Bar {
     id:   Int!
     name: String!
-    foos: [Foo!]!
 }
 type Query {
     foos: [Foo!]!
@@ -148,6 +105,49 @@ type Query {
 ::::::
 
 ## Designing Your GraphQL Schema (4)
+
+:::::: {.columns}
+::: {.column width="50%"}
+
+### Database Layout
+
+```
+TABLE foo
+    INT    id,
+    STRING name,
+    INT    bar.id
+
+TABLE bar
+    INT    id,
+    STRING name
+```
+
+:::
+::: {.column width="50%"}
+
+### GraphQL Schema
+
+```graphql
+type Foo {
+    id:   Int!
+    name: String!
+    bar:  Bar!
+}
+type Bar {
+    id:   Int!
+    name: String!
+    foos: [Foo!]!
+}
+type Query {
+    foos: [Foo!]!
+    bars: [Bar!]!
+}
+```
+
+:::
+::::::
+
+## Designing Your GraphQL Schema (5)
 
 :::::: {.columns}
 ::: {.column width="50%"}
@@ -196,10 +196,10 @@ type Query {
 
 ```scala
 // Global constant.
-val schema: Schema[DAO, Unit] = ...
+val yourSchema: Schema[YourContextType, Unit] = ...
 
-// Create in response to incoming request.
-val : DAO = ...
+// Usually create one per request.
+val yourContext: YourContextType = ...
 
 // Contained in POST body of incoming request.
 val unparsedQuery: String = ...
@@ -209,9 +209,9 @@ val parsedQuery: Try[Document] = QueryParser.parse(unparsedQuery)
 
 // May contain a ValidationError
 val futureResult: Future[Json] = Executor.execute(
-  queryAst    = parsedQuery.get,
-  userContext = dao,
-  schema      = schema
+  queryAst    = parsedQuery.get, // Try.get, don't actually do this!
+  userContext = yourContext,
+  schema      = yourSchema
 )
 ```
 
@@ -248,7 +248,7 @@ case class Foo( id:    Int,
 case class Bar( id:   Int,
                 name: String )
 
-trait DAO {}
+trait Ctx {}
 ```
 
 :::
@@ -268,7 +268,7 @@ case class Foo( id:    Int,
                 name:  String,
                 barId: Int     )
 
-trait DAO {}
+trait Ctx {}
 ```
 
 ### GraphQL Schema
@@ -287,7 +287,7 @@ type Foo {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val foo: GqlObject[DAO, Foo] = ???
+lazy val foo: GqlObject[Ctx, Foo] = ???
 ```
 
 :::
@@ -305,7 +305,7 @@ case class Foo( id:    Int,
                 name:  String,
                 barId: Int     )
 
-trait DAO {}
+trait Ctx {}
 ```
 
 ### GraphQL Schema
@@ -324,8 +324,8 @@ type Foo {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val foo: GqlObject[DAO, Foo] =
-  deriveObjectType[DAO, Foo]()
+lazy val foo: GqlObject[Ctx, Foo] =
+  deriveObjectType[Ctx, Foo]()
 ```
 
 :::
@@ -343,7 +343,7 @@ case class Foo( id:    Int,
                 name:  String,
                 barId: Int     )
 
-trait DAO {}
+trait Ctx {}
 ```
 
 ### GraphQL Schema
@@ -362,8 +362,8 @@ type Foo {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val foo: GqlObject[DAO, Foo] =
-  deriveObjectType[DAO, Foo](
+lazy val foo: GqlObject[Ctx, Foo] =
+  deriveObjectType[Ctx, Foo](
     ReplaceField(
       fieldName = "barId",
       field     = ???
@@ -386,7 +386,7 @@ case class Foo( id:    Int,
                 name:  String,
                 barId: Int     )
 
-trait DAO {}
+trait Ctx {}
 ```
 
 ### GraphQL Schema
@@ -405,14 +405,14 @@ type Foo {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val foo: GqlObject[DAO, Foo] =
-  deriveObjectType[DAO, Foo](
+lazy val foo: GqlObject[Ctx, Foo] =
+  deriveObjectType[Ctx, Foo](
     ReplaceField(
       fieldName = "barId",
       field     = GqlField(
         name      = "bar",
         fieldType = bar,
-        resolve   = cc => ???
+        resolve   = exe => ???
       )
     )
   )
@@ -433,8 +433,8 @@ case class Foo( id:    Int,
                 name:  String,
                 barId: Int     )
 
-trait DAO {
-  def fooBar(foo: Foo): Bar
+trait Ctx {
+  def fooBar(foo: Foo): Action[Ctx, Bar]
 }
 ```
 
@@ -454,15 +454,15 @@ type Foo {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val foo: GqlObject[DAO, Foo] =
-  deriveObjectType[DAO, Foo](
+lazy val foo: GqlObject[Ctx, Foo] =
+  deriveObjectType[Ctx, Foo](
     ReplaceField(
       fieldName = "barId",
       field     = GqlField(
         name      = "bar",
         fieldType = bar,
-        resolve   = cc =>
-          cc.ctx.fooBar(cc.value)
+        resolve   = exe =>
+          exe.ctx.fooBar(exe.value)
       )
     )
   )
@@ -482,7 +482,7 @@ lazy val foo: GqlObject[DAO, Foo] =
 case class Bar( id:   Int,
                 name: String )
 
-trait DAO {
+trait Ctx {
   def fooBar(foo: Foo): Bar
   def barFoos(bar: Bar): Foo
 }
@@ -504,14 +504,14 @@ type Bar {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val bar: GqlObject[DAO, Bar] =
-  deriveObjectType[DAO, Bar](
+lazy val bar: GqlObject[Ctx, Bar] =
+  deriveObjectType[Ctx, Bar](
     AddFields(
       GqlField(
         name =      "foos",
         fieldType = GqlList(foo),
-        resolve =   cc =>
-          cc.ctx.barFoos(cc.value)
+        resolve =   exe =>
+          exe.ctx.barFoos(exe.value)
       )
     )
   )
@@ -528,7 +528,7 @@ lazy val bar: GqlObject[DAO, Bar] =
 ### Data Layer
 
 ```scala
-trait DAO {
+trait Ctx {
   ...
   def queryFoos()
   def queryBars()
@@ -550,7 +550,7 @@ type Query {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val query: GqlObject[DAO, Unit] = ???
+lazy val query: GqlObject[Ctx, Unit] = ???
 ```
 
 :::
@@ -564,13 +564,15 @@ lazy val query: GqlObject[DAO, Unit] = ???
 ### Data Layer
 
 ```scala
-trait DAO {
+trait Ctx {
   ...
   def queryFoos(
-    ids: Option[Seq[Int]]): Seq[Foo]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 
   def queryBars(
-    ids: Option[Seq[Int]]): Seq[Bar]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 }
 ```
 
@@ -589,7 +591,7 @@ type Query {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val query: GqlObject[DAO, Unit] = ???
+lazy val query: GqlObject[Ctx, Unit] = ???
 ```
 
 :::
@@ -603,13 +605,15 @@ lazy val query: GqlObject[DAO, Unit] = ???
 ### Data Layer
 
 ```scala
-trait DAO {
+trait Ctx {
   ...
   def queryFoos(
-    ids: Option[Seq[Int]]): Seq[Foo]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 
   def queryBars(
-    ids: Option[Seq[Int]]): Seq[Bar]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 }
 ```
 
@@ -636,7 +640,7 @@ lazy val ids:
         GqlOptionInput(GqlListInput(GqlInt))
     )
 
-lazy val query: GqlObject[DAO, Unit] = ???
+lazy val query: GqlObject[Ctx, Unit] = ???
 ```
 
 :::
@@ -650,13 +654,15 @@ lazy val query: GqlObject[DAO, Unit] = ???
 ### Data Layer
 
 ```scala
-trait DAO {
+trait Ctx {
   ...
   def queryFoos(
-    ids: Option[Seq[Int]]): Seq[Foo]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 
   def queryBars(
-    ids: Option[Seq[Int]]): Seq[Bar]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 }
 ```
 
@@ -677,10 +683,10 @@ type Query {
 ```scala
 lazy val ids = ...
 
-lazy val query: GqlObject[DAO, Unit] =
+lazy val query: GqlObject[Ctx, Unit] =
   GqlObject(
     name   = "Query",
-    fields = gqlFields[DAO, Unit](
+    fields = gqlFields[Ctx, Unit](
       ???, // foos field
       ???  // bars field
     )
@@ -698,13 +704,15 @@ lazy val query: GqlObject[DAO, Unit] =
 ### Data Layer
 
 ```scala
-trait DAO {
+trait Ctx {
   ...
   def queryFoos(
-    ids: Option[Seq[Int]]): Seq[Foo]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 
   def queryBars(
-    ids: Option[Seq[Int]]): Seq[Bar]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 }
 ```
 
@@ -723,21 +731,21 @@ type Query {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val query: GqlObject[DAO, Unit] =
+lazy val query: GqlObject[Ctx, Unit] =
   GqlObject(
     name   = "Query",
-    fields = gqlFields[DAO, Unit](
+    fields = gqlFields[Ctx, Unit](
       GqlField(
         name      = "foos",
         fieldType = GqlList(foo),
         arguments = List(ids),
-        resolve   = cc => ???
+        resolve   = exe => ???
       ),
       GqlField(
         name      = "bars",
         fieldType = GqlList(bar),
         arguments = List(ids),
-        resolve   = cc => ???
+        resolve   = exe => ???
       )
     )
   )
@@ -754,13 +762,15 @@ lazy val query: GqlObject[DAO, Unit] =
 ### Data Layer
 
 ```scala
-trait DAO {
+trait Ctx {
   ...
   def queryFoos(
-    ids: Option[Seq[Int]]): Seq[Foo]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 
   def queryBars(
-    ids: Option[Seq[Int]]): Seq[Bar]
+    ids: Option[Seq[Int]]
+    ): Action[Ctx, Seq[Foo]]
 }
 ```
 
@@ -779,19 +789,19 @@ type Query {
 ### Sangria Schema Implementation
 
 ```scala
-lazy val query: GqlObject[DAO, Unit] =
+lazy val query: GqlObject[Ctx, Unit] =
   GqlObject(
     name   = "Query",
-    fields = gqlFields[DAO, Unit](
+    fields = gqlFields[Ctx, Unit](
       GqlField(
         ...
-        resolve   = cc =>
-          cc.ctx.queryFoos(cc.arg(ids))
+        resolve   = exe =>
+          exe.ctx.queryFoos(exe.arg(ids))
       ),
       GqlField(
         ...
-        resolve   = cc =>
-          cc.ctx.queryBars(cc.arg(ids))
+        resolve   = exe =>
+          exe.ctx.queryBars(exe.arg(ids))
       )
     )
   )

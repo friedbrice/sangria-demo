@@ -52,11 +52,11 @@ object SchemaDef {
           name      = "transactions",
           fieldType = GqlList(transaction),
           arguments = List(sinceDate, beforeDate, itemIds),
-          resolve   = cc => cc.ctx.shopperTransactions(
-            shopper    = cc.value,
-            sinceDate  = cc.arg(sinceDate),
-            beforeDate = cc.arg(beforeDate),
-            itemIds    = cc.arg(itemIds)
+          resolve   = exec => exec.ctx.shopperTransactions(
+            shopper    = exec.value,
+            sinceDate  = exec.arg(sinceDate),
+            beforeDate = exec.arg(beforeDate),
+            itemIds    = exec.arg(itemIds)
           )
         )
       )
@@ -69,11 +69,11 @@ object SchemaDef {
           name      = "transactions",
           fieldType = GqlList(transaction),
           arguments = List(sinceDate, beforeDate, shopperIds),
-          resolve   = cc => cc.ctx.itemTransactions(
-            item       = cc.value,
-            sinceDate  = cc.arg(sinceDate),
-            beforeDate = cc.arg(beforeDate),
-            shopperIds = cc.arg(shopperIds)
+          resolve   = exec => exec.ctx.itemTransactions(
+            item       = exec.value,
+            sinceDate  = exec.arg(sinceDate),
+            beforeDate = exec.arg(beforeDate),
+            shopperIds = exec.arg(shopperIds)
           )
         )
       )
@@ -86,19 +86,19 @@ object SchemaDef {
         field     = GqlField(
           name      = "shopper",
           fieldType = shopper,
-          resolve   = cc => cc.ctx.transactionShopper(cc.value)
+          resolve   = exec => exec.ctx.transactionShopper(exec.value)
         )
       ),
       derive.AddFields(
         GqlField(
           name      = "items",
           fieldType = GqlList(item),
-          resolve   = cc => cc.ctx.transactionItems(cc.value)
+          resolve   = exec => exec.ctx.transactionItems(exec.value)
         ),
         GqlField(
           name      = "total",
           fieldType = GqlInt,
-          resolve   = cc => cc.ctx.transactionTotal(cc.value)
+          resolve   = exec => exec.ctx.transactionTotal(exec.value)
         )
       )
     )
@@ -111,25 +111,25 @@ object SchemaDef {
           name      = "shoppers",
           fieldType = GqlList(shopper),
           arguments = List(shopperIds),
-          resolve   = cc => cc.ctx.queryShoppers(cc.arg(shopperIds))
+          resolve   = exec => exec.ctx.queryShoppers(exec.arg(shopperIds))
         ),
         GqlField(
           name      = "items",
           fieldType = GqlList(item),
           arguments = List(itemIds),
-          resolve   = cc => cc.ctx.queryItems(cc.arg(itemIds))
+          resolve   = exec => exec.ctx.queryItems(exec.arg(itemIds))
         ),
         GqlField(
           name      = "transactions",
           fieldType = GqlList(transaction),
           arguments =
             List(transactionIds, sinceDate, beforeDate, shopperIds, itemIds),
-          resolve   = cc => cc.ctx.queryTransactions(
-            transactionIds = cc.arg(transactionIds),
-            sinceDate      = cc.arg(sinceDate),
-            beforeDate     = cc.arg(beforeDate),
-            shopperIds     = cc.arg(shopperIds),
-            itemIds        = cc.arg(itemIds)
+          resolve   = exec => exec.ctx.queryTransactions(
+            transactionIds = exec.arg(transactionIds),
+            sinceDate      = exec.arg(sinceDate),
+            beforeDate     = exec.arg(beforeDate),
+            shopperIds     = exec.arg(shopperIds),
+            itemIds        = exec.arg(itemIds)
           )
         )
       )
