@@ -483,8 +483,8 @@ case class Bar( id:   Int,
                 name: String )
 
 trait Ctx {
-  def fooBar(foo: Foo): Bar
-  def barFoos(bar: Bar): Foo
+  def fooBar(foo: Foo): Action[Ctx, Bar]
+  def barFoos(bar: Bar): Action[Ctx, Seq[Foo]]
 }
 ```
 
@@ -508,9 +508,9 @@ lazy val bar: GqlObject[Ctx, Bar] =
   deriveObjectType[Ctx, Bar](
     AddFields(
       GqlField(
-        name =      "foos",
+        name      = "foos",
         fieldType = GqlList(foo),
-        resolve =   exe =>
+        resolve   = exe =>
           exe.ctx.barFoos(exe.value)
       )
     )
@@ -572,7 +572,7 @@ trait Ctx {
 
   def queryBars(
     ids: Option[Seq[Int]]
-    ): Action[Ctx, Seq[Foo]]
+    ): Action[Ctx, Seq[Bar]]
 }
 ```
 
@@ -613,7 +613,7 @@ trait Ctx {
 
   def queryBars(
     ids: Option[Seq[Int]]
-    ): Action[Ctx, Seq[Foo]]
+    ): Action[Ctx, Seq[Bar]]
 }
 ```
 
@@ -662,7 +662,7 @@ trait Ctx {
 
   def queryBars(
     ids: Option[Seq[Int]]
-    ): Action[Ctx, Seq[Foo]]
+    ): Action[Ctx, Seq[Bar]]
 }
 ```
 
@@ -712,7 +712,7 @@ trait Ctx {
 
   def queryBars(
     ids: Option[Seq[Int]]
-    ): Action[Ctx, Seq[Foo]]
+    ): Action[Ctx, Seq[Bar]]
 }
 ```
 
@@ -770,7 +770,7 @@ trait Ctx {
 
   def queryBars(
     ids: Option[Seq[Int]]
-    ): Action[Ctx, Seq[Foo]]
+    ): Action[Ctx, Seq[Bar]]
 }
 ```
 
