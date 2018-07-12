@@ -33,13 +33,13 @@ object Main extends App {
       .flatMap(_.field("query")).flatMap(_.string)
       .`catch` {
         val msg = s"Unable to parse request body: $postBody"
-        (401, "application/json", format(msg))
+        (400, "application/json", format(msg))
       }
 
     parsedQuery <- SangriaQueryParser.parse(query).`catch` {
 
       case err: SangriaSyntaxError =>
-        (401, "application/json", format(err.getMessage))
+        (400, "application/json", format(err.getMessage))
 
       case err =>
         (500, "application/json", format(err.getMessage))
