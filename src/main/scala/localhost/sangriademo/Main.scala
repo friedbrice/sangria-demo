@@ -55,11 +55,11 @@ object Main extends App {
         (400, "application/json", err.resolveError.toString)
 
       case err: AuthError =>
-        (403, "application/json", format(err.getMessage))
+        (401, "application/json", format(err.getMessage))
 
       case _: TimeoutException =>
         val msg = "Computational limit reached, please refine your query."
-        (403, "application/json", format(msg))
+        (401, "application/json", format(msg))
 
       case err =>
         (500, "application/json", format(err.getMessage))
