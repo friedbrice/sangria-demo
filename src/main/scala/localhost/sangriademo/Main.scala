@@ -52,7 +52,7 @@ object Main extends App {
     ).`catch`(await = 1.minute) {
 
       case err: SangriaErrorWithResolver =>
-        (401, "application/json", err.resolveError.toString)
+        (400, "application/json", err.resolveError.toString)
 
       case err: AuthError =>
         (403, "application/json", format(err.getMessage))
