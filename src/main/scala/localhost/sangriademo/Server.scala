@@ -7,6 +7,18 @@ import scala.io.Source
 
 object Server {
 
+  type Path = String
+  type Method = String
+  type Body = String
+  type AuthToken = String
+
+  type Status = Int
+  type ContentType = String
+  type Content = String
+
+  type Request = (Path, Method, Body, Option[AuthToken])
+  type Response = (Status, ContentType, Content)
+
   def serve(port: Int)(routes: Request => Response): Unit = {
 
     val handler = new jetty.server.handler.AbstractHandler {

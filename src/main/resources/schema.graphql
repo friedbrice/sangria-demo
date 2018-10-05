@@ -1,0 +1,99 @@
+"Record representing a person who shops on our site."
+type Shopper {
+    "Shopper unique identifier."
+    id: Int!
+
+    "The display name of the shopper (not necessarily unique)."
+    name: String!
+
+    "The transactions this shopper has made on our site."
+    transactions(
+        "If provided, returns only transactions occurring on or after."
+        sinceDate: Int,
+
+        "If provided, returns only transactions occurring before."
+        beforeDate: Int,
+
+        "If provided, returns only transactions that include the specified items."
+        itemIds: [Int!]
+    ): [Transaction!]!
+}
+
+"Record representing an item that may be purchased on our site."
+type Item {
+    "Item unique identifier."
+    id: Int!
+
+    "The display name of the item (not necessarily unique)."
+    name: String!
+
+    "The price of the item, in cents."
+    price: Int!
+
+    "A description of the item."
+    description: String
+
+    "The transactions this item has been purchased in."
+    transactions(
+        "If provided, returns only transactions occurring on or after."
+        sinceDate: Int,
+
+        "If provided, returns only transactions occurring before."
+        beforeDate: Int,
+
+        "If provided, returns only transactions made by the specified shoppers."
+        shopperIds: [Int!]
+    ): [Transaction!]!
+}
+
+"A record of a transaction for one or more items made by a shopper."
+type Transaction {
+    "Transaction unique identifier."
+    id: Int!
+
+    "The transaction date, as number of seconds after Epoch."
+    date: Int!
+
+    "The shopper who made this transaction."
+    shopper: Shopper!
+
+    "The items bought in this transaction."
+    items: [Item!]!
+
+    "The sum of the prices of the items in this transaction."
+    total: Int!
+}
+
+"Entry point for queries."
+type Query {
+
+    "Query all shoppers."
+    shoppers(
+        "If provided, returns only the specified shoppers."
+        shopperIds: [Int!]
+    ): [Shopper!]!
+
+    "Query all items."
+    items(
+        "If provided, returns only the specified items."
+        itemIds: [Int!]
+    ): [Item!]!
+
+    "Query all transactions."
+    transactions(
+        "If provided, returns only the specified transactions."
+        transactionIds: [Int!],
+
+        "If provided, returns only transactions occurring on or after."
+        sinceDate: Int,
+
+        "If provided, returns only transactions occurring before."
+        beforeDate: Int,
+
+        "If provided, returns only transactions made by the specified shoppers."
+        shopperIds: [Int!],
+
+        "If provided, returns only transactions that include the specified items."
+        itemIds: [Int!]
+    ): [Transaction!]!
+}

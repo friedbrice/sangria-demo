@@ -8,18 +8,6 @@ import scala.util.Try
 
 package object sangriademo {
 
-  type Path = String
-  type Method = String
-  type Body = String
-  type AuthToken = String
-
-  type Status = Int
-  type ContentType = String
-  type Content = String
-
-  type Request = (Path, Method, Body, Option[AuthToken])
-  type Response = (Status, ContentType, Content)
-
   case class AuthError(message: String) extends Exception(message)
 
   case class Shopper( id: Int,
@@ -91,5 +79,11 @@ package object sangriademo {
 
   implicit class ConvergeEither[A](val self: Either[A, A]) extends AnyVal {
     def converge: A = self.fold(identity, identity)
+  }
+
+  implicit class Cast[A](val self: A) extends AnyVal {
+    def cast[B]: Option[B] =
+      try Some(self.asInstanceOf[B])
+      catch { case _: Throwable => None }
   }
 }
