@@ -25,8 +25,8 @@ object FalsoDB {
                         ): Action[Context, Seq[Transaction]] =
       queryTransactions(None, sinceDate, beforeDate, None, Some(List(item.id)))
 
-    override def transactionShopper( transaction: Transaction
-                                   ): Action[Context, Shopper] =
+    def transactionShopper( transaction: Transaction
+                          ): Action[Context, Shopper] =
       fakeShoppers(transaction.shopperId)
 
     def transactionItems( transaction: Transaction
